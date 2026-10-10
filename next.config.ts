@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Auth-first app: elke pagina leest cookies, Cache Components verwacht
+  // expliciet gecachete data of Suspense-grenzen. Voor nu uit.
+  // partialPrefetching vereist cacheComponents, dus beide uit.
+  cacheComponents: false,
   turbopack: {
     rules: {
       "*.css": {

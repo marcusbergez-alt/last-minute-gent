@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-16 text-center">
@@ -12,10 +14,20 @@ export default function Home() {
           Last-minute afspraken bij Gentse kappers, nagel- en wimperstudio{"’"}s
           en schoonheidsspecialisten — met korting.
         </p>
-        <p className="text-sm text-zinc-500">
-          Deze site wordt momenteel opgebouwd. Zaak in Gent? Je kan je binnenkort
-          aanmelden via <code className="rounded bg-zinc-100 px-1.5 py-0.5">/voor-zaken</code>.
-        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+          <Link
+            href="/voor-zaken"
+            className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            Meld je zaak aan
+          </Link>
+          <Link
+            href="/auth/signin"
+            className="rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+          >
+            Inloggen
+          </Link>
+        </div>
       </div>
     </main>
   );
