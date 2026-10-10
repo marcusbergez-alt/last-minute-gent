@@ -42,6 +42,10 @@ supabase/.branches
 supabase/.temp
 supabase/.env
 
+# claude code / oh-my-claudecode session state
+.omc/
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
