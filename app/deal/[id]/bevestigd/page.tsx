@@ -37,7 +37,7 @@ const DT = new Intl.DateTimeFormat("nl-BE", {
 });
 
 export const metadata = {
-  title: "Bevestigd — Startup 1",
+  title: "Bevestigd — Last-minute Gent",
 };
 
 export default async function BevestigdPage(props: {

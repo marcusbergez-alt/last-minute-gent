@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { signoutAction } from "@/app/auth/signin/actions";
 
 export const metadata = {
-  title: "Admin — Startup 1",
+  title: "Admin — Last-minute Gent",
 };
 
 export default async function AdminLayout({

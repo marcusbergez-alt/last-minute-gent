@@ -4,7 +4,7 @@ import { signinAction } from "./actions";
 type SearchParams = { error?: string };
 
 export const metadata = {
-  title: "Inloggen — Startup 1",
+  title: "Inloggen — Last-minute Gent",
 };
 
 export default async function SigninPage(props: {

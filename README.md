@@ -1,4 +1,4 @@
-# Startup 1 — Last-minute afspraken
+# Last-minute Gent — Last-minute afspraken
 
 Website waar Gentse salons (kappers, nagel- en wimperstudio's, schoonheidsspecialisten)
 hun lege last-minute slots met korting aanbieden, en klanten die slots met één klik claimen.

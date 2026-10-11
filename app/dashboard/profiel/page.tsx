@@ -6,7 +6,7 @@ import { saveProfileAction } from "./actions";
 type SearchParams = { ok?: string; error?: string };
 
 export const metadata = {
-  title: "Profiel — Startup 1",
+  title: "Profiel — Last-minute Gent",
 };
 
 export default async function ProfielPage(props: {

@@ -72,6 +72,7 @@ export async function addSlotAction(
     const kortingsPct = Math.round((1 - korting / normale) * 100);
 
     after(async () => {
+      console.log("[new-slot] after() start, slot:", slotId);
       try {
         const admin = createAdminClient();
         const { data: subs } = await admin
@@ -80,6 +81,7 @@ export async function addSlotAction(
         const emails = (subs ?? [])
           .map((s) => s.email as string)
           .filter(Boolean);
+        console.log(`[new-slot] ${emails.length} subscribers gevonden.`);
         if (emails.length === 0) return;
 
         await sendNewSlotDigest(emails, {

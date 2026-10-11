@@ -81,11 +81,6 @@ export async function sendNewSlotDigest(
   props: NewSlotDigestProps,
 ) {
   if (to.length === 0) return { skipped: true as const };
-  const html = await render(NewSlotDigestEmail(props));
-  const text = await render(NewSlotDigestEmail(props), { plainText: true });
-
-  // Resend accepteert max 50 'to'-adressen per call. We chunken naar 50
-  // en gebruiken 'bcc' zodat ontvangers elkaar niet zien.
   const resend = getResend();
   if (!resend) {
     console.warn(
@@ -93,25 +88,38 @@ export async function sendNewSlotDigest(
     );
     return { skipped: true as const };
   }
-  const chunks: string[][] = [];
-  for (let i = 0; i < to.length; i += 50) chunks.push(to.slice(i, i + 50));
 
+  const html = await render(NewSlotDigestEmail(props));
+  const text = await render(NewSlotDigestEmail(props), { plainText: true });
+  const subject = `Nieuwe deal: ${props.behandeling} bij ${props.zaakNaam}`;
+  const from = getEmailFrom();
+
+  // Resend's batch endpoint stuurt tot 100 mails per call en respecteert
+  // de 'onboarding@resend.dev' restrictie per recipient individueel.
   let sent = 0;
+  let errored = 0;
+  const chunks: string[][] = [];
+  for (let i = 0; i < to.length; i += 100) chunks.push(to.slice(i, i + 100));
+
   for (const chunk of chunks) {
-    const { error } = await resend.emails.send({
-      from: getEmailFrom(),
-      to: getEmailFrom(),
-      bcc: chunk,
-      subject: `Nieuwe deal: ${props.behandeling} bij ${props.zaakNaam}`,
+    const payload = chunk.map((email) => ({
+      from,
+      to: email,
+      subject,
       html,
       text,
       tags: [{ name: "type", value: "new-slot-digest" }],
-    });
+    }));
+    const { data, error } = await resend.batch.send(payload);
     if (error) {
-      console.error("[email] digest chunk error:", error);
+      console.error("[email] digest batch error:", error);
+      errored += chunk.length;
       continue;
     }
-    sent += chunk.length;
+    sent += data?.data?.length ?? chunk.length;
   }
+  console.log(
+    `[email] digest verzonden: ${sent}/${to.length} subscribers (${errored} errors).`,
+  );
   return { ok: true as const, sent };
 }

@@ -5,7 +5,7 @@ import { BUSINESS_TYPES, BUSINESS_TYPE_LABEL } from "@/lib/types";
 type SearchParams = { error?: string };
 
 export const metadata = {
-  title: "Voor zaken — Startup 1",
+  title: "Voor zaken — Last-minute Gent",
   description:
     "Meld je Gentse salon aan en vul lege last-minute slots met korting.",
 };

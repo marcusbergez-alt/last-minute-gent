@@ -12,7 +12,7 @@ export function getResend(): Resend | null {
 }
 
 export function getEmailFrom(): string {
-  return process.env.EMAIL_FROM ?? "Startup 1 <onboarding@resend.dev>";
+  return process.env.EMAIL_FROM ?? "Last-minute Gent <onboarding@resend.dev>";
 }
 
 export function getSiteUrl(): string {

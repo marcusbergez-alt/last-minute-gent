@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Startup 1 — Last-minute afspraken in Gent",
+  title: "Last-minute Gent — Last-minute afspraken in Gent",
   description:
     "Vul vandaag nog een leeg last-minute slot bij een Gentse kapper, nagel- of wimperstudio, met korting.",
 };

@@ -84,7 +84,7 @@ export function NewSlotDigestEmail(props: NewSlotDigestProps) {
           marginTop: "20px",
         }}
       >
-        Je ontvangt deze omdat je je inschreef voor meldingen op Startup 1. Niet
+        Je ontvangt deze omdat je je inschreef voor meldingen op Last-minute Gent. Niet
         meer interessant? Antwoord op deze mail en we zetten je offline.
       </Text>
     </Layout>

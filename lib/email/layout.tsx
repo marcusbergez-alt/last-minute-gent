@@ -47,7 +47,7 @@ export function Layout({
                 margin: 0,
               }}
             >
-              Startup 1
+              Last-minute Gent
             </Text>
             <Text
               style={{
@@ -84,7 +84,7 @@ export function Layout({
             {footer ?? (
               <Text style={{ fontSize: "11px", color: "#a1a1aa", margin: 0 }}>
                 Je ontvangt deze e-mail omdat je iets geboekt of ingeschreven
-                hebt op Startup 1. Vragen? Antwoord op deze mail.
+                hebt op Last-minute Gent. Vragen? Antwoord op deze mail.
               </Text>
             )}
           </Section>

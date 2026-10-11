@@ -1,7 +1,7 @@
 type SearchParams = { email?: string };
 
 export const metadata = {
-  title: "Check je mail — Startup 1",
+  title: "Check je mail — Last-minute Gent",
 };
 
 export default async function CheckEmailPage(props: {
