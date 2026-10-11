@@ -1,34 +1,163 @@
 import Link from "next/link";
+import { Hero } from "@/components/home/hero";
+import { Reveal } from "@/components/home/reveal";
+import { LenisProvider } from "@/components/providers/lenis-provider";
+
+const STAPPEN = [
+  {
+    nr: "01",
+    titel: "Zet een slot online",
+    tekst:
+      "Minder dan 30 seconden werk. Datum, uur, behandeling, korting. Klaar.",
+  },
+  {
+    nr: "02",
+    titel: "Klant claimt",
+    tekst:
+      "Gentse klanten zien het slot op onze site. Eén klik en het is bezet.",
+  },
+  {
+    nr: "03",
+    titel: "Klant komt en betaalt",
+    tekst:
+      "Je markeert gekomen of niet-gekomen. Enkel 'gekomen' telt mee voor je factuur.",
+  },
+];
+
+const VOORDELEN = [
+  {
+    titel: "Geen abonnement",
+    tekst:
+      "Je betaalt enkel een vast bedrag per afspraak die effectief doorging. Eerste maand gratis voor testzaken.",
+  },
+  {
+    titel: "Jij blijft baas",
+    tekst:
+      "Jij kiest welke slots je deelt, met welke korting, en wanneer. Pauzeren kan altijd met één klik.",
+  },
+  {
+    titel: "Klant betaalt in de zaak",
+    tekst:
+      "Geen online betalingen om op te volgen. We geven je enkel naam, gsm en een code — klant toont de code bij aankomst.",
+  },
+];
 
 export default function Home() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="w-full max-w-md space-y-6">
-        <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
-          Binnenkort online
-        </span>
-        <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          Startup 1
-        </h1>
-        <p className="text-balance text-base leading-relaxed text-zinc-600">
-          Last-minute afspraken bij Gentse kappers, nagel- en wimperstudio{"’"}s
-          en schoonheidsspecialisten — met korting.
-        </p>
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <Link
-            href="/voor-zaken"
-            className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
+    <LenisProvider>
+      <main className="min-h-dvh bg-white">
+        <Hero />
+
+        {/* Hoe werkt het */}
+        <section className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+                Hoe het werkt
+              </p>
+              <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                Van leeg kwartier naar bezoeker in drie stappen.
+              </h2>
+            </div>
+          </Reveal>
+
+          <Reveal
+            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3"
+            stagger={0.12}
+            childrenSelector="[data-stap]"
           >
-            Meld je zaak aan
-          </Link>
-          <Link
-            href="/auth/signin"
-            className="rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
-          >
-            Inloggen
-          </Link>
-        </div>
-      </div>
-    </main>
+            {STAPPEN.map((s) => (
+              <div
+                key={s.nr}
+                data-stap
+                className="relative rounded-xl border border-zinc-200 bg-white p-6"
+              >
+                <span className="font-mono text-sm text-zinc-400">{s.nr}</span>
+                <h3 className="mt-4 text-lg font-medium">{s.titel}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                  {s.tekst}
+                </p>
+              </div>
+            ))}
+          </Reveal>
+        </section>
+
+        {/* Waarom voor zaken */}
+        <section className="border-y border-zinc-200 bg-zinc-50/60">
+          <div className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
+            <Reveal>
+              <div className="mx-auto max-w-2xl text-center">
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+                  Voor zaken
+                </p>
+                <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                  Lage drempel. Jij houdt controle.
+                </h2>
+              </div>
+            </Reveal>
+
+            <Reveal
+              className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3"
+              stagger={0.1}
+              childrenSelector="[data-feat]"
+            >
+              {VOORDELEN.map((v) => (
+                <div
+                  key={v.titel}
+                  data-feat
+                  className="rounded-xl border border-zinc-200 bg-white p-6"
+                >
+                  <h3 className="text-base font-medium">{v.titel}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    {v.tekst}
+                  </p>
+                </div>
+              ))}
+            </Reveal>
+          </div>
+        </section>
+
+        {/* CTA band */}
+        <section className="mx-auto max-w-3xl px-5 py-20 text-center sm:py-28">
+          <Reveal>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              Klaar om een leeg kwartier geld waard te maken?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-balance text-sm text-zinc-600 sm:text-base">
+              Aanmelden duurt een minuut. Eerste maand gratis en je kan altijd
+              pauzeren.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/voor-zaken"
+                className="group inline-flex items-center gap-2 rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-xs transition hover:bg-zinc-800"
+              >
+                Meld je zaak aan
+                <span
+                  aria-hidden
+                  className="transition-transform group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </Link>
+            </div>
+          </Reveal>
+        </section>
+
+        <footer className="border-t border-zinc-200">
+          <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-5 py-8 text-xs text-zinc-500 sm:flex-row">
+            <p>© {new Date().getFullYear()} Startup 1 · Gent</p>
+            <nav className="flex gap-4">
+              <Link href="/voor-zaken" className="hover:text-zinc-900">
+                Voor zaken
+              </Link>
+              <Link href="/auth/signin" className="hover:text-zinc-900">
+                Inloggen
+              </Link>
+            </nav>
+          </div>
+        </footer>
+      </main>
+    </LenisProvider>
   );
 }
