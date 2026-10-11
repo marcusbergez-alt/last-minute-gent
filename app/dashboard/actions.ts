@@ -1,9 +1,27 @@
 "use server";
 
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getOwnBusiness, requireUser } from "@/lib/auth";
 import type { ClaimStatus } from "@/lib/types";
+import { getSiteUrl } from "@/lib/email/client";
+import { sendNewSlotDigest } from "@/lib/email/send";
+
+const EURO = new Intl.NumberFormat("nl-BE", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const DT = new Intl.DateTimeFormat("nl-BE", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Brussels",
+});
 
 export async function addSlotAction(
   formData: FormData,
@@ -31,15 +49,53 @@ export async function addSlotAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("slots").insert({
-    business_id: business.id,
-    start_tijd: date.toISOString(),
-    behandeling_naam: behandeling,
-    normale_prijs: normale,
-    kortingsprijs: korting,
-  });
+  const { data: inserted, error } = await supabase
+    .from("slots")
+    .insert({
+      business_id: business.id,
+      start_tijd: date.toISOString(),
+      behandeling_naam: behandeling,
+      normale_prijs: normale,
+      kortingsprijs: korting,
+    })
+    .select("id")
+    .maybeSingle();
 
   if (error) return { error: error.message };
+
+  // Alleen een digest sturen als de zaak publiek is.
+  if (
+    inserted?.id &&
+    business.status === "goedgekeurd"
+  ) {
+    const slotId = inserted.id as string;
+    const kortingsPct = Math.round((1 - korting / normale) * 100);
+
+    after(async () => {
+      try {
+        const admin = createAdminClient();
+        const { data: subs } = await admin
+          .from("subscribers")
+          .select("email");
+        const emails = (subs ?? [])
+          .map((s) => s.email as string)
+          .filter(Boolean);
+        if (emails.length === 0) return;
+
+        await sendNewSlotDigest(emails, {
+          zaakNaam: business.naam,
+          behandeling,
+          startTijdLabel: DT.format(date),
+          normalePrijsLabel: EURO.format(normale),
+          kortingsPrijsLabel: EURO.format(korting),
+          kortingsPct,
+          dealUrl: `${getSiteUrl()}/deal/${slotId}`,
+        });
+      } catch (e) {
+        console.error("[new-slot] digest error:", e);
+      }
+    });
+  }
 
   revalidatePath("/dashboard");
   return {};

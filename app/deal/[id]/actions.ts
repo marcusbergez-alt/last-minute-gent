@@ -1,8 +1,29 @@
 "use server";
 
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getBron } from "@/lib/bron";
+import { getSiteUrl } from "@/lib/email/client";
+import {
+  sendClaimConfirmation,
+  sendBusinessNotification,
+} from "@/lib/email/send";
+
+const EURO = new Intl.NumberFormat("nl-BE", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const DT = new Intl.DateTimeFormat("nl-BE", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Brussels",
+});
 
 export async function claimAction(
   formData: FormData,
@@ -30,14 +51,73 @@ export async function claimAction(
     p_bron: bron,
   });
 
-  if (error) {
-    // RPC-level errors (RAISE EXCEPTION) komen hier binnen als message.
-    return { error: error.message };
-  }
+  if (error) return { error: error.message };
 
   const row = Array.isArray(data) ? data[0] : data;
   const claimId: string | undefined = row?.claim_id;
-  if (!claimId) return { error: "Onbekende fout bij claim." };
+  const code: string | undefined = row?.code;
+  if (!claimId || !code) return { error: "Onbekende fout bij claim." };
+
+  // Mails worden na response verstuurd zodat de klant geen 2s wacht.
+  after(async () => {
+    try {
+      const admin = createAdminClient();
+      const { data: slot } = await admin
+        .from("slots")
+        .select(
+          `id, start_tijd, behandeling_naam, kortingsprijs, normale_prijs,
+           business:businesses(naam, slug, adres, email)`,
+        )
+        .eq("id", slotId)
+        .maybeSingle();
+
+      if (!slot) return;
+      const business = (slot as { business: unknown }).business as
+        | {
+            naam: string;
+            slug: string;
+            adres: string | null;
+            email: string | null;
+          }
+        | null;
+      if (!business) return;
+
+      const site = getSiteUrl();
+      const startDate = new Date(slot.start_tijd);
+      const startTijdLabel = DT.format(startDate);
+      const kortingsPrijsLabel = EURO.format(Number(slot.kortingsprijs));
+      const bevestigdUrl = `${site}/deal/${slotId}/bevestigd?claim=${claimId}`;
+      const kanAnnuleren =
+        startDate.getTime() - Date.now() > 3 * 60 * 60 * 1000;
+
+      await Promise.all([
+        sendClaimConfirmation(email, {
+          klantNaam: naam,
+          behandeling: slot.behandeling_naam ?? "Behandeling",
+          zaakNaam: business.naam,
+          zaakAdres: business.adres,
+          startTijdLabel,
+          code,
+          kortingsPrijsLabel,
+          bevestigdUrl,
+          kanAnnuleren,
+        }),
+        business.email
+          ? sendBusinessNotification(business.email, {
+              zaakNaam: business.naam,
+              behandeling: slot.behandeling_naam ?? "Behandeling",
+              startTijdLabel,
+              klantNaam: naam,
+              klantGsm: gsm,
+              code,
+              dashboardUrl: `${site}/dashboard`,
+            })
+          : Promise.resolve(),
+      ]);
+    } catch (e) {
+      console.error("[claim] email dispatch error:", e);
+    }
+  });
 
   redirect(`/deal/${slotId}/bevestigd?claim=${claimId}`);
 }
