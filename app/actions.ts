@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getBron } from "@/lib/bron";
 
 export async function subscribeAction(
   formData: FormData,
@@ -8,8 +9,8 @@ export async function subscribeAction(
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const voorkeur =
     String(formData.get("voorkeur_behandeling") ?? "").trim() || null;
-  const bron =
-    String(formData.get("bron") ?? "homepage").trim() || "homepage";
+  const fallbackBron = String(formData.get("bron") ?? "homepage").trim();
+  const bron = (await getBron()) ?? fallbackBron ?? "homepage";
 
   if (!email || !email.includes("@")) {
     return { error: "Vul een geldig e-mailadres in." };

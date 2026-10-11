@@ -2,27 +2,8 @@ import Link from "next/link";
 import { Hero } from "@/components/home/hero";
 import { Reveal } from "@/components/home/reveal";
 import { LenisProvider } from "@/components/providers/lenis-provider";
-
-const STAPPEN = [
-  {
-    nr: "01",
-    titel: "Zet een slot online",
-    tekst:
-      "Minder dan 30 seconden werk. Datum, uur, behandeling, korting. Klaar.",
-  },
-  {
-    nr: "02",
-    titel: "Klant claimt",
-    tekst:
-      "Gentse klanten zien het slot op onze site. Eén klik en het is bezet.",
-  },
-  {
-    nr: "03",
-    titel: "Klant komt en betaalt",
-    tekst:
-      "Je markeert gekomen of niet-gekomen. Enkel 'gekomen' telt mee voor je factuur.",
-  },
-];
+import { DealsGrid } from "@/components/home/deals-grid";
+import { BUSINESS_TYPES, type BusinessType } from "@/lib/types";
 
 const VOORDELEN = [
   {
@@ -42,47 +23,53 @@ const VOORDELEN = [
   },
 ];
 
-export default function Home() {
+type SearchParams = { when?: string; type?: string };
+
+function normalizeWhen(w?: string): "vandaag" | "morgen" | "alles" {
+  return w === "vandaag" || w === "morgen" ? w : "alles";
+}
+
+function normalizeType(t?: string): BusinessType | "alle" {
+  return (BUSINESS_TYPES as readonly string[]).includes(t ?? "")
+    ? (t as BusinessType)
+    : "alle";
+}
+
+export default async function Home(props: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const sp = await props.searchParams;
+  const when = normalizeWhen(sp.when);
+  const type = normalizeType(sp.type);
+
   return (
     <LenisProvider>
       <main className="min-h-dvh bg-white">
         <Hero />
 
-        {/* Hoe werkt het */}
-        <section className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
+        {/* Live aanbod */}
+        <section id="aanbod" className="mx-auto max-w-6xl px-5 py-16 sm:py-24">
           <Reveal>
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">
-                Hoe het werkt
+                Aanbod
               </p>
               <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                Van leeg kwartier naar bezoeker in drie stappen.
+                Open slots in Gent — nu te claimen.
               </h2>
+              <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-600 sm:text-base">
+                Elke deal is tot vandaag of morgen beschikbaar. Je claimt met één
+                klik en betaalt bij aankomst in de zaak.
+              </p>
             </div>
           </Reveal>
 
-          <Reveal
-            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3"
-            stagger={0.12}
-            childrenSelector="[data-stap]"
-          >
-            {STAPPEN.map((s) => (
-              <div
-                key={s.nr}
-                data-stap
-                className="relative rounded-xl border border-zinc-200 bg-white p-6"
-              >
-                <span className="font-mono text-sm text-zinc-400">{s.nr}</span>
-                <h3 className="mt-4 text-lg font-medium">{s.titel}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-                  {s.tekst}
-                </p>
-              </div>
-            ))}
-          </Reveal>
+          <div className="mt-10">
+            <DealsGrid when={when} type={type} />
+          </div>
         </section>
 
-        {/* Waarom voor zaken */}
+        {/* Voor zaken */}
         <section className="border-y border-zinc-200 bg-zinc-50/60">
           <div className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
             <Reveal>
