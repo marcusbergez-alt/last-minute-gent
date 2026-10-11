@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   BUSINESS_TYPE_LABEL,
   type BusinessType,
@@ -8,6 +10,33 @@ import {
 import { ClaimForm } from "./claim-form";
 
 type Params = { id: string };
+
+export async function generateMetadata(props: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { id } = await props.params;
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("slots")
+    .select("behandeling_naam, business:businesses(naam)")
+    .eq("id", id)
+    .maybeSingle<{
+      behandeling_naam: string | null;
+      business: { naam: string } | null;
+    }>();
+
+  const beh = data?.behandeling_naam ?? "Last-minute deal";
+  const zaak = data?.business?.naam ?? "Gentse zaak";
+  const title = `${beh} bij ${zaak}`;
+  const description = `Claim deze last-minute plek bij ${zaak} in Gent met korting. Betaal in de zaak, geen online betaling.`;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 type SlotWithBusiness = {
   id: string;

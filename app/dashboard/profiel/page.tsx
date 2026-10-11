@@ -45,6 +45,46 @@ export default async function ProfielPage(props: {
         </p>
       </header>
 
+      {business.status === "goedgekeurd" && (
+        <section className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+              QR-code voor je zaak
+            </h2>
+            <p className="text-xs text-zinc-500">
+              Plak aan de kassa of op een poster. Scanners landen op jouw
+              zaakpagina, met UTM-bron <code>salon-qr</code> zodat je kan meten
+              welke QR werkt.
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/zaak/${business.slug}/qr?size=512`}
+              alt={`QR-code naar ${business.naam}`}
+              className="h-24 w-24 rounded-md border border-zinc-200"
+            />
+            <div className="flex flex-col gap-2">
+              <a
+                href={`/zaak/${business.slug}/qr?size=1024`}
+                download={`qr-${business.slug}.png`}
+                className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              >
+                Download PNG (1024px)
+              </a>
+              <a
+                href={`/zaak/${business.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-zinc-500 underline-offset-2 hover:underline"
+              >
+                Bekijk zaakpagina
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
       {ok && (
         <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
           Profiel bijgewerkt.

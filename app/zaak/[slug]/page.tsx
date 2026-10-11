@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +26,7 @@ const TIME = new Intl.DateTimeFormat("nl-BE", {
 
 export async function generateMetadata(props: {
   params: Promise<Params>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await props.params;
   const supabase = await createClient();
   const { data } = await supabase
@@ -36,9 +37,14 @@ export async function generateMetadata(props: {
     .maybeSingle();
 
   if (!data) return { title: "Niet gevonden" };
+
+  const title = data.naam;
+  const description = `Open last-minute slots bij ${data.naam} in Gent met korting. Claim met één klik en betaal in de zaak.`;
   return {
-    title: `${data.naam} — Last-minute afspraken`,
-    description: `Open last-minute slots bij ${data.naam} in Gent.`,
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

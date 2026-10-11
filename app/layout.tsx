@@ -15,9 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Last-minute Gent — korting bij Gentse salons",
+  title: {
+    default: "Last-minute Gent — korting bij Gentse salons",
+    template: "%s · Last-minute Gent",
+  },
   description:
     "Vul vandaag nog een leeg last-minute slot bij een Gentse kapper, nagel- of wimperstudio, met korting.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  openGraph: {
+    type: "website",
+    locale: "nl_BE",
+    siteName: "Last-minute Gent",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export const viewport: Viewport = {
